@@ -44,6 +44,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Extract token
         String token = jwtUtils.extractJwtFromCookie(request);
+        log.debug(token);
+        System.out.println(token + " DEBUGGING");
+
         if (token == null) {
             token = jwtUtils.extractJwtFromRequest(request);
         }
