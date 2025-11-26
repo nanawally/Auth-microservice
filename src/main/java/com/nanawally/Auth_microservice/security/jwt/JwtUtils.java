@@ -39,6 +39,7 @@ public class JwtUtils {
         String token = Jwts.builder()
                 .subject(customUser.getUsername())  // sub
                 .claim("authorities", roles)  // claim: authorities (claim is used for custom fields)
+                .claim("user_id", customUser.getId().toString())
                 .issuedAt(new Date())               // iat
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs)) // exp
                 .signWith(key)  // TODO - signWith using a predefined Algorithm. //.signWith(key, SignatureAlgorithm)
