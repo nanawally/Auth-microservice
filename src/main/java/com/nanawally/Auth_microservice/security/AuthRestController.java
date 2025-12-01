@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,6 +35,23 @@ public class AuthRestController {
         this.jwtUtils = jwtUtils;
         this.authenticationManager = authenticationManager;
         this.amqpTemplate = amqpTemplate;
+    }
+
+    @GetMapping("/auth/check")
+    public ResponseEntity<?> checkIfLoggedIn() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication.getPrincipal().equals("anonymousUser")) {
+            return ResponseEntity.status(401).body(Map.of("loggedIn", false));
+        }
+
+        // Optional: return username and roles if logged in
+        return ResponseEntity.ok(Map.of(
+                "loggedIn", true,
+                "username", authentication.getName(),
+                "authorities", authentication.getAuthorities()
+        ));
     }
 
     @PostMapping("/login")
@@ -102,4 +121,17 @@ public class AuthRestController {
                 "token", token
         ));
     }
+
+    @PostMapping("/auth/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        Cookie cookie = new Cookie("authToken", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // deletes cookie
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok("Logged out");
+    }
+
 }
