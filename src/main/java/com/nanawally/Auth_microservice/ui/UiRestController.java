@@ -1,19 +1,42 @@
 package com.nanawally.Auth_microservice.ui;
 
+import com.nanawally.Auth_microservice.user.CustomUser;
+import com.nanawally.Auth_microservice.user.CustomUserRepository;
+import com.nanawally.Auth_microservice.user.authority.UserRole;
+import com.nanawally.Auth_microservice.user.dto.CustomUserCreationDTO;
+import com.nanawally.Auth_microservice.user.dto.CustomUserSelfRegisterDTO;
+import com.nanawally.Auth_microservice.user.mapper.CustomUserMapper;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 public class UiRestController {
 
-    /*
-    @GetMapping("/")
-    public ResponseEntity<String> homepage() {
+    private final CustomUserRepository customUserRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final CustomUserMapper customUserMapper;
 
-    }*/
+    @Autowired
+    public UiRestController(CustomUserRepository customUserRepository, PasswordEncoder passwordEncoder, CustomUserMapper customUserMapper) {
+        this.customUserRepository = customUserRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.customUserMapper = customUserMapper;
+    }
 
     @GetMapping("/about")
     public ResponseEntity<String> about(Authentication authentication) {
@@ -34,10 +57,36 @@ public class UiRestController {
         }
         return ResponseEntity.ok().build();
     }
+
+
+    @PostMapping("/register")
+    public ResponseEntity<Map<String, Object>> registerUser(@Valid @RequestBody CustomUserSelfRegisterDTO dto, BindingResult bindingResult) {
+        Map<String, Object> response = new HashMap<>();
+
+        if (bindingResult.hasErrors()) {
+            response.put("ok", false);
+            response.put("message", bindingResult.getAllErrors()
+                    .stream()
+                    .map(ObjectError::getDefaultMessage)
+                    .toList());
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        CustomUser user = customUserMapper.toRegisterEntity(dto);
+        user.setPassword(user.getPassword(), passwordEncoder);
+        user.setAccountNonExpired(true);
+        user.setAccountNonLocked(true);
+        user.setCredentialsNonExpired(true);
+        user.setEnabled(true);
+        user.setRoles(Set.of(UserRole.USER));
+
+        customUserRepository.save(user);
+
+        response.put("ok", true);
+        response.put("message", "User registered successfully");
+
+        return ResponseEntity.ok(response);
+    }
+
 }
 
-
-/*
- * have if (isOk) for all endpoints
- * return responseentitys
- * */

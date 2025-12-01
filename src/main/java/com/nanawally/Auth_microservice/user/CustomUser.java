@@ -30,6 +30,11 @@ public class CustomUser {
     public CustomUser() {
     }
 
+    public CustomUser(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
     public CustomUser(String username, String password, boolean isAccountNonExpired, boolean isAccountNonLocked, boolean isCredentialsNonExpired, boolean isEnabled, Set<UserRole> roles) {
         this.username = username;
         this.password = password;

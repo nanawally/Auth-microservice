@@ -4,6 +4,7 @@ package com.nanawally.Auth_microservice.user.mapper;
 import com.nanawally.Auth_microservice.user.CustomUser;
 import com.nanawally.Auth_microservice.user.dto.CustomUserCreationDTO;
 import com.nanawally.Auth_microservice.user.dto.CustomUserResponseDTO;
+import com.nanawally.Auth_microservice.user.dto.CustomUserSelfRegisterDTO;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,6 +19,13 @@ public class CustomUserMapper {
                 customUserCreationDTO.isCredentialsNonExpired(),
                 customUserCreationDTO.isEnabled(),
                 customUserCreationDTO.roles()
+        );
+    }
+
+    public CustomUser toRegisterEntity(CustomUserSelfRegisterDTO customUserSelfRegisterDTO) {
+        return new CustomUser(
+                customUserSelfRegisterDTO.username(),
+                customUserSelfRegisterDTO.password()
         );
     }
 
