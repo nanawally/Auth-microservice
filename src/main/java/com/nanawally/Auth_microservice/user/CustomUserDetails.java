@@ -9,13 +9,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public class CustomUserDetails implements UserDetails {
-
-    private final CustomUser customUser;
-
-    public CustomUserDetails(CustomUser customUser) {
-        this.customUser = customUser;
-    }
+public record CustomUserDetails(CustomUser customUser) implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -57,9 +51,5 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return customUser.isEnabled();
-    }
-
-    public CustomUser getCustomUser() {
-        return customUser;
     }
 }
