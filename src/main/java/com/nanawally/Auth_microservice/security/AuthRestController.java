@@ -94,7 +94,7 @@ public class AuthRestController {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
         // Step 3: Generate JWT using your domain model (now includes roles)
-        String token = jwtUtils.generateJwtToken(customUserDetails.getCustomUser());
+        String token = jwtUtils.generateJwtToken(customUserDetails.customUser());
 
         // Step 4: Set cookie
         Cookie cookie = new Cookie("authToken", token);
