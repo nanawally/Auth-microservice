@@ -4,6 +4,7 @@ import com.nanawally.Auth_microservice.advice.exception.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -58,6 +59,17 @@ public class GlobalExceptionHandler {
         return buildResponse(
                 HttpStatus.NOT_FOUND,
                 "Username Not Found",
+                e.getMessage(),
+                request
+        );
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponseBody> handleDataIntegrityViolationException(DataIntegrityViolationException e, HttpServletRequest request) {
+        logger.warn("Data Integrity Violation: {}", e.getMessage());
+        return buildResponse(
+                HttpStatus.CONFLICT,
+                "Data Integrity Violation",
                 e.getMessage(),
                 request
         );
