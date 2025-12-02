@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponseBody> handleTaskNotFoundException(UserNotFoundException e, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponseBody> handleUserNotFoundException(UserNotFoundException e, HttpServletRequest request) {
         logger.warn("User Not Found: {}", e.getMessage());
         return buildResponse(
                 HttpStatus.NOT_FOUND,
