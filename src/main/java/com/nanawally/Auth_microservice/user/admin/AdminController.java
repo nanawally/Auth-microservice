@@ -13,14 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/admin")
@@ -57,6 +52,20 @@ public class AdminController {
         customUserRepository.save(user);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
+
+        Optional<CustomUser> userToDelete = customUserRepository.findById(id);
+
+        if(userToDelete.isPresent()) {
+            customUserRepository.deleteById(id);
+            logger.info("Delete user with id: {}", id);
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }
