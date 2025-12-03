@@ -11,6 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AdminService {
@@ -22,7 +24,7 @@ public class AdminService {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AdminService(CustomUserRepository customUserRepository, CustomUserMapper customUserMapper, PasswordEncoder passwordEncoder){
+    public AdminService(CustomUserRepository customUserRepository, CustomUserMapper customUserMapper, PasswordEncoder passwordEncoder) {
         this.customUserRepository = customUserRepository;
         this.customUserMapper = customUserMapper;
         this.passwordEncoder = passwordEncoder;
@@ -51,18 +53,16 @@ public class AdminService {
         return user;
     }
 
-    /*
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
-
+    public boolean deleteUserById(UUID id) {
         Optional<CustomUser> userToDelete = customUserRepository.findById(id);
 
-        if(userToDelete.isPresent()) {
+        if (userToDelete.isPresent()) {
             customUserRepository.deleteById(id);
             logger.info("Delete user with id: {}", id);
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
+            return true;
         }
-    }*/
+
+        logger.warn("User with id {} was not found", id);
+        return false;
+    }
 }
