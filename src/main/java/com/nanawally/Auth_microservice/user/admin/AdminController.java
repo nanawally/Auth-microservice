@@ -54,15 +54,10 @@ public class AdminController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
 
-        Optional<CustomUser> userToDelete = customUserRepository.findById(id);
-
-        if(userToDelete.isPresent()) {
-            customUserRepository.deleteById(id);
-            logger.info("Delete user with id: {}", id);
+        if (adminService.deleteUserById(id)) {
             return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
         }
-    }
 
+        return ResponseEntity.notFound().build();
+    }
 }
