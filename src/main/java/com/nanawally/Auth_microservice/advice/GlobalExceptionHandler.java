@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -86,4 +88,25 @@ public class GlobalExceptionHandler {
                 request
         );
     }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponseBody> handleValidationException(
+            MethodArgumentNotValidException e,
+            HttpServletRequest request) {
+
+        String errors = e.getBindingResult()
+                .getAllErrors()
+                .stream()
+                .map(ObjectError::getDefaultMessage)
+                .reduce((a, b) -> a + "; " + b)
+                .orElse("Validation error");
+
+        return buildResponse(
+                HttpStatus.BAD_REQUEST,
+                "Validation Error",
+                errors,
+                request
+        );
+    }
+
 }

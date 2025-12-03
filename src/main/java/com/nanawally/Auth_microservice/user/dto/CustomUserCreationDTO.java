@@ -28,10 +28,10 @@ public record CustomUserCreationDTO(
         @NotNull boolean isEnabled,
 
         @NotEmpty
-        @Pattern(
+        /*@Pattern(
                 regexp = "^(GUEST|USER|ADMIN)$",
                 message = "Must be a Valid Role"
-        )
+        )*/
         Set<UserRole> roles
 ) {
 }
