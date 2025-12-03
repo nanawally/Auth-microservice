@@ -33,7 +33,7 @@ public class AdminController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @GetMapping("/")
+    @GetMapping("/users")
     public ResponseEntity<List<CustomUser>> getAllUsers(){
         return ResponseEntity.ok().body(customUserRepository.findAll());
     }
