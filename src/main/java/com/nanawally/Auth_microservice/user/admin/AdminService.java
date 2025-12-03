@@ -2,42 +2,40 @@ package com.nanawally.Auth_microservice.user.admin;
 
 import com.nanawally.Auth_microservice.user.CustomUser;
 import com.nanawally.Auth_microservice.user.CustomUserRepository;
-import com.nanawally.Auth_microservice.user.authority.UserRole;
-import com.nanawally.Auth_microservice.user.dto.CustomUserCreationDTO;
-import com.nanawally.Auth_microservice.user.dto.CustomUserSelfRegisterDTO;
 import com.nanawally.Auth_microservice.user.mapper.CustomUserMapper;
-import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
 
-@RestController
-@RequestMapping("/admin")
-public class AdminController {
+@Service
+public class AdminService {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(AdminService.class);
+
     private final CustomUserRepository customUserRepository;
     private final CustomUserMapper customUserMapper;
     private final PasswordEncoder passwordEncoder;
-    private final AdminService adminService;
 
     @Autowired
-    public AdminController(CustomUserRepository customUserRepository, CustomUserMapper customUserMapper, PasswordEncoder passwordEncoder, AdminService adminService) {
+    public AdminService(CustomUserRepository customUserRepository, CustomUserMapper customUserMapper, PasswordEncoder passwordEncoder){
         this.customUserRepository = customUserRepository;
         this.customUserMapper = customUserMapper;
         this.passwordEncoder = passwordEncoder;
-        this.adminService = adminService;
     }
+
+    public List<CustomUser> getAllUsers() {
+        return customUserRepository.findAll();
+    }
+
+    /*
 
     @GetMapping("/users")
     public ResponseEntity<List<CustomUser>> getAllUsers(){
-        return ResponseEntity.ok().body(adminService.getAllUsers());
+        return ResponseEntity.ok().body(customUserRepository.findAll());
     }
 
     @PostMapping("/register")
@@ -68,6 +66,5 @@ public class AdminController {
         } else {
             return ResponseEntity.notFound().build();
         }
-    }
-
+    }*/
 }
