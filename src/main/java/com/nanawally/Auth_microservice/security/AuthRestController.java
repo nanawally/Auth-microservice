@@ -108,11 +108,11 @@ public class AuthRestController {
         logger.info("Authentication successful for user: {}", customUserLoginDTO.username());
 
         // RabbitMQ
-        amqpTemplate.convertAndSend(
+        /*amqpTemplate.convertAndSend(
                 RabbitConfig.EXCHANGE_NAME,
                 RabbitConfig.ROUTING_KEY,
-                "User Logged in, todo: send email to user to alert them of login from weird IP addresses"
-        );
+                "User Created"
+        );*/
 
         // Step 5: Return token - Optional
         return ResponseEntity.ok(Map.of(

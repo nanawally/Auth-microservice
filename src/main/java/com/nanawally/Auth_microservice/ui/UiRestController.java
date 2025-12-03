@@ -1,5 +1,7 @@
 package com.nanawally.Auth_microservice.ui;
 
+import com.nanawally.Auth_microservice.config.RabbitConfig;
+import com.nanawally.Auth_microservice.rabbitmq.EmailMessageProducer;
 import com.nanawally.Auth_microservice.user.CustomUser;
 import com.nanawally.Auth_microservice.user.CustomUserRepository;
 import com.nanawally.Auth_microservice.user.authority.UserRole;
@@ -7,6 +9,7 @@ import com.nanawally.Auth_microservice.user.dto.CustomUserCreationDTO;
 import com.nanawally.Auth_microservice.user.dto.CustomUserSelfRegisterDTO;
 import com.nanawally.Auth_microservice.user.mapper.CustomUserMapper;
 import jakarta.validation.Valid;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,12 +33,16 @@ public class UiRestController {
     private final CustomUserRepository customUserRepository;
     private final PasswordEncoder passwordEncoder;
     private final CustomUserMapper customUserMapper;
+    private final EmailMessageProducer emailMessageProducer;
+    private final AmqpTemplate amqpTemplate;
 
     @Autowired
-    public UiRestController(CustomUserRepository customUserRepository, PasswordEncoder passwordEncoder, CustomUserMapper customUserMapper) {
+    public UiRestController(CustomUserRepository customUserRepository, PasswordEncoder passwordEncoder, CustomUserMapper customUserMapper, EmailMessageProducer emailMessageProducer, AmqpTemplate amqpTemplate) {
         this.customUserRepository = customUserRepository;
         this.passwordEncoder = passwordEncoder;
         this.customUserMapper = customUserMapper;
+        this.emailMessageProducer = emailMessageProducer;
+        this.amqpTemplate = amqpTemplate;
     }
 
     @GetMapping("/about")
@@ -81,6 +88,16 @@ public class UiRestController {
         user.setRoles(Set.of(UserRole.USER));
 
         customUserRepository.save(user);
+
+        // Publish RabbitMQ message AFTER successful registration
+        /*amqpTemplate.convertAndSend(
+                RabbitConfig.EXCHANGE_NAME,
+                RabbitConfig.ROUTING_KEY,
+                user.getUsername()  // send username to Email microservice
+        );*/
+
+        // Custom message producer class so to not call AmqpTemplate directly.
+        emailMessageProducer.sendRegistrationEmailMessage(user.getUsername());
 
         response.put("ok", true);
         response.put("message", "User registered successfully");
