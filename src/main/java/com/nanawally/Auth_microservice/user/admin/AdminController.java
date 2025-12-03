@@ -37,23 +37,18 @@ public class AdminController {
 
     @GetMapping("/users")
     public ResponseEntity<List<CustomUser>> getAllUsers(){
+
+        if (adminService.getAllUsers().isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
         return ResponseEntity.ok().body(adminService.getAllUsers());
     }
 
     @PostMapping("/register")
     public ResponseEntity<CustomUser> registerUser(@Valid @RequestBody CustomUserCreationDTO dto) {
-
-        CustomUser user = customUserMapper.toEntity(dto);
-        user.setPassword(user.getPassword(), passwordEncoder);
-        user.setAccountNonExpired(dto.isAccountNonExpired());
-        user.setAccountNonLocked(dto.isAccountNonLocked());
-        user.setCredentialsNonExpired(dto.isCredentialsNonExpired());
-        user.setEnabled(dto.isEnabled());
-        user.setRoles(dto.roles());
-
-        customUserRepository.save(user);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+         CustomUser newUser = adminService.registerUser(dto);
+         return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
 
     @DeleteMapping("/delete/{id}")

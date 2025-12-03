@@ -2,6 +2,7 @@ package com.nanawally.Auth_microservice.user.admin;
 
 import com.nanawally.Auth_microservice.user.CustomUser;
 import com.nanawally.Auth_microservice.user.CustomUserRepository;
+import com.nanawally.Auth_microservice.user.dto.CustomUserCreationDTO;
 import com.nanawally.Auth_microservice.user.mapper.CustomUserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,19 +29,13 @@ public class AdminService {
     }
 
     public List<CustomUser> getAllUsers() {
+        if (customUserRepository.findAll().isEmpty()) {
+            logger.info("No users found");
+        }
         return customUserRepository.findAll();
     }
 
-    /*
-
-    @GetMapping("/users")
-    public ResponseEntity<List<CustomUser>> getAllUsers(){
-        return ResponseEntity.ok().body(customUserRepository.findAll());
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<CustomUser> registerUser(@Valid @RequestBody CustomUserCreationDTO dto) {
-
+    public CustomUser registerUser(CustomUserCreationDTO dto) {
         CustomUser user = customUserMapper.toEntity(dto);
         user.setPassword(user.getPassword(), passwordEncoder);
         user.setAccountNonExpired(dto.isAccountNonExpired());
@@ -51,9 +46,12 @@ public class AdminService {
 
         customUserRepository.save(user);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+        logger.info("New CustomUser with id {} was created successfully", user.getId());
+
+        return user;
     }
 
+    /*
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
 
