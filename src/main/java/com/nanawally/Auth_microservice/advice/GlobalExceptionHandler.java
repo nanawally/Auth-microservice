@@ -13,11 +13,19 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.View;
+
+import java.net.ConnectException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private final View error;
+
+    public GlobalExceptionHandler(View error) {
+        this.error = error;
+    }
 
     private ResponseEntity<ErrorResponseBody> buildResponse(
             HttpStatus status,
@@ -48,6 +56,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponseBody> handleRuntimeException(RuntimeException e, HttpServletRequest request) {
         logger.error("Unexpected Runtime Exception: ", e);
+
+        if (e.getCause() instanceof ConnectException) {
+            logger.warn("Connect Exception: {}", e.getMessage());
+            return buildResponse(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "Unable To Connect to RabbitMQ",
+                    e.getMessage(),
+                    request
+            );
+        }
+
         return buildResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "Runtime Exception",
@@ -105,6 +124,17 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 "Validation Error",
                 errors,
+                request
+        );
+    }
+
+    @ExceptionHandler(ConnectException.class)
+    public ResponseEntity<ErrorResponseBody> handleConnectException(ConnectException e, HttpServletRequest request) {
+        logger.warn("Connect Exception: {}", e.getMessage());
+        return buildResponse(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "Unable To Connect to RabbitMQ",
+                e.getMessage(),
                 request
         );
     }
