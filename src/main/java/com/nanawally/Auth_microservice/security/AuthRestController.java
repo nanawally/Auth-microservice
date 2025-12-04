@@ -107,13 +107,6 @@ public class AuthRestController {
 
         logger.info("Authentication successful for user: {}", customUserLoginDTO.username());
 
-        // RabbitMQ
-        /*amqpTemplate.convertAndSend(
-                RabbitConfig.EXCHANGE_NAME,
-                RabbitConfig.ROUTING_KEY,
-                "User Created"
-        );*/
-
         // Step 5: Return token - Optional
         return ResponseEntity.ok(Map.of(
                 "username", customUserLoginDTO.username(),
