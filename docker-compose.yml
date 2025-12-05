@@ -1,0 +1,102 @@
+version: "3.9"
+
+services:
+  # =========================
+  # RabbitMQ
+  # =========================
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"   # AMQP
+      - "15672:15672" # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - backend
+
+  # =========================
+  # PostgreSQL Database
+  # =========================
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_DB: microservices
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  # =========================
+  # Auth Service (depends on RabbitMQ + DB)
+  # =========================
+  auth-service:
+    build:
+      context: ../Auth-microservice
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - rabbitmq
+      - postgres
+    environment:
+      # RabbitMQ
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+
+      # Database
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/microservices
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    networks:
+      - backend
+
+  # =========================
+  # Todo Service (depends on DB only)
+  # =========================
+  todo-service:
+    build:
+      context: ../ToDo-microservice
+      dockerfile: Dockerfile
+    container_name: todo-service
+    ports:
+      - "8090:8090"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/microservices
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    networks:
+      - backend
+
+  # =========================
+  # Email Service (no dependencies)
+  # =========================
+  email-service:
+    build:
+      context: ../Email-microservice
+      dockerfile: Dockerfile
+    container_name: email-service
+    ports:
+      - "8070:8070"
+    networks:
+      - backend
+
+# =============================
+# Networks & Volumes
+# =============================
+networks:
+  backend:
+
+volumes:
+  postgres_data:
