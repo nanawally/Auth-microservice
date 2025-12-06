@@ -20,7 +20,8 @@ public class AppCorsConfig {
                 "http://172.0.0.1:3000",
                 "https://todo-application-git-master-anna-wallstroms-projects.vercel.app",
                 "https://todo-application-dolz4x1kd-anna-wallstroms-projects.vercel.app",
-                "https://nalix.vercel.app"
+                "https://nalix.vercel.app",
+                "https://todo-microservice-6lak.onrender.com"
         ));
         corsConfiguration.setAllowedHeaders(List.of("*"));          // new, trying out
         corsConfiguration.setExposedHeaders(List.of("Set-Cookie")); // new, trying out
