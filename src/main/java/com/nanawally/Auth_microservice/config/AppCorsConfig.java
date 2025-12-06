@@ -15,7 +15,13 @@ public class AppCorsConfig {
 
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-        corsConfiguration.setAllowedOrigins(List.of("http://localhost:3000", "http://172.0.0.1:3000", "todo-application-74g3wqt2l-anna-wallstroms-projects.vercel.app"));
+        corsConfiguration.setAllowedOrigins(List.of(
+                "http://localhost:3000",
+                "http://172.0.0.1:3000",
+                "https://todo-application-git-master-anna-wallstroms-projects.vercel.app",
+                "https://todo-application-dolz4x1kd-anna-wallstroms-projects.vercel.app",
+                "https://nalix.vercel.app"
+        ));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(List.of("Content-Type", "Authorization", "X-Requested-With"));
         corsConfiguration.setAllowCredentials(true); // Send Cookies
