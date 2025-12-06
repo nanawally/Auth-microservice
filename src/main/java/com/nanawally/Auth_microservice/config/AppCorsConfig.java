@@ -22,6 +22,8 @@ public class AppCorsConfig {
                 "https://todo-application-dolz4x1kd-anna-wallstroms-projects.vercel.app",
                 "https://nalix.vercel.app"
         ));
+        corsConfiguration.setAllowedHeaders(List.of("*"));          // new, trying out
+        corsConfiguration.setExposedHeaders(List.of("Set-Cookie")); // new, trying out
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(List.of("Content-Type", "Authorization", "X-Requested-With"));
         corsConfiguration.setAllowCredentials(true); // Send Cookies
